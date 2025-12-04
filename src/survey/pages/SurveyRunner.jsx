@@ -11,12 +11,21 @@ export default function SurveyRunner() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({}); // Store answers temporarily in state
   const [submitted, setSubmitted] = useState(false); // Track submission status
+  const [surveyCompleted, setSurveyCompleted] = useState(false); // Track if the survey is completed
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         // Fetch question summaries by participant token
         const resSummary = await axiosInstance.get(`http://192.168.1.48:8081/survey/${token}`);
+
+        // If the survey is already completed, handle it
+        if (resSummary.data?.code === "400" && resSummary.data?.error === "You already completed this survey") {
+          setSurveyCompleted(true);
+          setLoading(false);  // No need to load questions if survey is completed
+          return;  // Stop further processing
+        }
+
         const questionSummaries = resSummary.data?.data?.questions || [];
 
         if (questionSummaries.length === 0) {
@@ -49,8 +58,8 @@ export default function SurveyRunner() {
         
       } catch (err) {
         console.error("Error fetching survey questions:", err);
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchQuestions();
@@ -70,8 +79,7 @@ export default function SurveyRunner() {
     }));
   };
 
-  const next = async () => {
-    await saveAnswerToDB();
+  const next = () => {
     if (currentIndex < questions.length - 1) setCurrentIndex(currentIndex + 1);
   };
 
@@ -124,6 +132,22 @@ export default function SurveyRunner() {
     }
   };
 
+  const saveDraft = () => {
+    // Save the answers in the browser's localStorage as a draft
+    localStorage.setItem(`surveyDraft_${token}`, JSON.stringify(answers));
+    alert("Taslak kaydedildi!");
+  };
+
+  if (surveyCompleted) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <h2>Bu anketi zaten tamamladınız</h2>
+          <p>Bu ankete zaten cevap verdiniz. Anket tamamlanmıştır.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) return <div style={{ padding: 20 }}>Yükleniyor...</div>;
 
@@ -217,6 +241,11 @@ export default function SurveyRunner() {
           )}
         </div>
 
+        <div style={{ marginTop: "15px" }}>
+          <button style={styles.btnSave} onClick={saveDraft}>
+            Taslak Kaydet
+          </button>
+        </div>
       </div>
     </div>
   );

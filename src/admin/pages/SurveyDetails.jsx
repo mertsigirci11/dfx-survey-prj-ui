@@ -7,6 +7,8 @@ import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { CreateQuestionModal } from "../components/CreateQuestionModal";
+import ParticipantsModal from "../components/ParticipantsModal";
 
 export default function SurveyDetail() {
     const { id: surveyId } = useParams();
@@ -14,6 +16,10 @@ export default function SurveyDetail() {
     const [survey, setSurvey] = useState(null);
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [createVisible, setCreateVisible] = useState(false);
+    const [editVisible, setEditVisible] = useState(false);
+    const [selectedQuestion, setSelectedQuestion] = useState(null);
+    const [participantsVisible, setParticipantsVisible] = useState(false);
 
     // -----------------------------------------------------
     // LOAD SURVEY DETAIL
@@ -77,22 +83,9 @@ export default function SurveyDetail() {
     // EDIT QUESTION
     // -----------------------------------------------------
     const onEdit = async (qId) => {
-        // başka bir sayfaya form açılacaksa navigate edebilirsin:
-        // navigate(`/admin/question/${qId}`)
-        alert("Edit screen gelecek → " + qId);
-    };
-
-    // -----------------------------------------------------
-    // ADD NEW QUESTION
-    // -----------------------------------------------------
-    const onAddNew = async () => {
-        await axiosInstance.post(`/admin/questions/${surveyId}`, {
-            question: "Yeni soru",
-            type: "FREETEXT",
-            order: questions.length + 1,
-            options: []
-        });
-        fetchSurveyDetail();
+        const question = questions.find(q => q.id === qId);
+        setSelectedQuestion(question);
+        setEditVisible(true);
     };
 
     // -----------------------------------------------------
@@ -142,6 +135,26 @@ export default function SurveyDetail() {
         );
     };
 
+    const onAddNewQuestion = async (payload) => {
+        const maxOrder = questions.length + 1;
+
+        await axiosInstance.post(`/admin/questions/${surveyId}`, {
+            ...payload,
+            order: maxOrder
+        });
+
+        fetchSurveyDetail();
+    };
+
+    const onEditSave = async (payload) => {
+        await axiosInstance.put(`/admin/questions/${selectedQuestion.id}`, {
+            ...payload,
+            order: selectedQuestion.order
+        });
+
+        fetchSurveyDetail();
+    };
+
     const actionTemplate = (row) => (
         <div style={{ display: "flex", gap: "6px" }}>
             <Button label="Delete" className="p-button-sm p-button-danger" onClick={() => onDelete(row.id)} />
@@ -158,7 +171,7 @@ export default function SurveyDetail() {
 
             {/* HEADER */}
             <div style={{ display: "flex", gap: "10px", marginBottom: "20px", alignItems: "center" }}>
-                
+
                 {/* EXPIRE DATE */}
                 <div>
                     <label>Expire Date</label>
@@ -169,9 +182,8 @@ export default function SurveyDetail() {
                     />
                 </div>
 
-                <Button label="Katılımcılar" className="p-button-secondary" />
-                <Button label="Anketi Kaydet" className="p-button-success" onClick={onSaveSurvey} />
-                <Button label="+Yeni" className="p-button-primary" onClick={onAddNew} />
+                <Button label="Katılımcılar" className="p-button-secondary" onClick={() => setParticipantsVisible(true)} />
+                <Button label="+Yeni" className="p-button-primary" onClick={() => setCreateVisible(true)} />
             </div>
 
             {/* QUESTIONS TABLE */}
@@ -197,6 +209,26 @@ export default function SurveyDetail() {
 
                 <Column header="Aksiyon" body={actionTemplate} style={{ width: "14rem" }} />
             </DataTable>
+            <CreateQuestionModal
+                visible={createVisible}
+                mode="create"
+                onHide={() => setCreateVisible(false)}
+                onSave={onAddNewQuestion}
+            />
+
+            <CreateQuestionModal
+                visible={editVisible}
+                mode="edit"
+                initialData={selectedQuestion}
+                onHide={() => setEditVisible(false)}
+                onSave={onEditSave}
+            />
+
+            <ParticipantsModal
+                visible={participantsVisible}
+                onHide={() => setParticipantsVisible(false)}
+                surveyId={surveyId}
+            />
         </div>
     );
 }

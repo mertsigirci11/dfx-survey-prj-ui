@@ -4,11 +4,12 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import "../login.css";
 import axios from "axios";
-import { redirect } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();   // 👈 HOOK
 
   const handleLogin = async () => {
     try{
@@ -25,13 +26,12 @@ export default function Login() {
           }
         }
       );
-      console.log("API Response:", response.code);
       var localStorageTokenItem = {
         "token": response.data.data.accessToken,
         "refreshToken": response.data.data.refreshToken
       }
       localStorage.setItem("token", JSON.stringify(localStorageTokenItem));
-      redirect("/admin/survey");
+      navigate("/admin/survey");
     }catch(err){
       alert("HATA: "+ err);
     }

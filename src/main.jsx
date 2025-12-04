@@ -14,6 +14,7 @@ import "./index.css";
 
 import Logout from "./admin/pages/Logout";
 import Login from "./login/login";
+import SurveyReport from "./surveyReport/SurveyReport";
 
 const router = createBrowserRouter([
   {
@@ -34,7 +35,8 @@ const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { index: true, element: <Surveys />, },
-      { path: ":id", element: <SurveyDetails />, }
+      { path: ":id", element: <SurveyDetails />, },
+      { path: "report/:id", element: <SurveyReport></SurveyReport>}
     ]
   },
   {

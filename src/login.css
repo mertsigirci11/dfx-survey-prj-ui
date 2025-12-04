@@ -1,0 +1,23 @@
+/* Sayfayı hem dikey hem yatay ortala */
+.login-wrapper {
+  height: 100vh;               /* tam ekran */
+  display: flex;
+  justify-content: center;     /* yatay ortalama */
+  align-items: center;         /* dikey ortalama */
+}
+
+/* Kart genişliği */
+.login-card {
+  width: 350px;
+}
+
+/* Input araları */
+.field {
+  margin-bottom: 15px;
+}
+
+/* Login düğmesi */
+.login-btn {
+  width: 100%;
+  margin-top: 10px;
+}

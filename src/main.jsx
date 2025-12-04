@@ -1,13 +1,27 @@
-import { createRoot } from 'react-dom/client'
-import { PrimeReactProvider } from 'primereact/api';
+import { createRoot } from "react-dom/client";
+import { PrimeReactProvider } from "primereact/api";
+import {
+  RouterProvider,
+  createBrowserRouter
+} from "react-router-dom";
 
 import "primereact/resources/themes/lara-light-cyan/theme.css";
-import './index.css'
+import "./index.css";
 
-import App from './App.jsx'
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <div>PlaceHolder</div>,
+    children: [
+      { index: true, element: <div>PlaceHolder</div>, },
+      { path: "about", element: <div>PlaceHolder</div>, },
+      { path: "*", element: <div>PlaceHolder</div>, }
+    ]
+  }
+]);
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <PrimeReactProvider>
-    <App />
-  </PrimeReactProvider>,
-)
+    <RouterProvider router={router} />
+  </PrimeReactProvider>
+);

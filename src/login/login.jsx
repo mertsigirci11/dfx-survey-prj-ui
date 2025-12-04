@@ -4,6 +4,7 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import "../login.css";
 import axios from "axios";
+import { redirect } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -30,8 +31,7 @@ export default function Login() {
         "refreshToken": response.data.data.refreshToken
       }
       localStorage.setItem("token", JSON.stringify(localStorageTokenItem));
-      alert("Login success!");
-      window.location.href = "/admin/surveys";
+      redirect("/admin/survey");
     }catch(err){
       alert("HATA: "+ err);
     }

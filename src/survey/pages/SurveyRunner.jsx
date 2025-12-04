@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";  // useNavigate for redirection
-import { axiosInstance } from "../../admin/utils/Axios";
+import axios from "axios";
 
 export default function SurveyRunner() {
   const { token } = useParams(); // participant token
@@ -17,7 +17,7 @@ export default function SurveyRunner() {
     const fetchQuestions = async () => {
       try {
         // Fetch question summaries by participant token
-        const resSummary = await axiosInstance.get(`http://192.168.1.48:8081/survey/${token}`);
+        const resSummary = await axios.get(`http://192.168.1.48:8081/survey/${token}`);
 
         // If the survey is already completed, handle it
         if (resSummary.data?.code === "400" && resSummary.data?.error === "You already completed this survey") {
@@ -37,7 +37,7 @@ export default function SurveyRunner() {
         const detailedQuestions = await Promise.all(
           questionSummaries.map(async (q) => {
             try {
-              const resDetail = await axiosInstance.get(`http://192.168.1.48:8081/admin/questions/${q.id}`);
+              const resDetail = await axios.get(`http://192.168.1.48:8081/admin/questions/${q.id}`);
               return resDetail.data?.data || q; // Fallback to summary if detail fails
             } catch (err) {
               return q;
@@ -101,7 +101,7 @@ export default function SurveyRunner() {
       }));
 
       // Send answers to DB
-      await axiosInstance.post("http://192.168.1.48:8081/survey/answers", payload);
+      await axios.post("http://192.168.1.48:8081/survey/answers", payload);
     } catch (err) {
       console.error("Error saving answer to DB:", err);
     }
@@ -124,7 +124,7 @@ export default function SurveyRunner() {
 
   const completeSurvey = async () => {
     try {
-      await axiosInstance.post(`http://192.168.1.48:8081/survey/${token}/complete`);
+      await axios.post(`http://192.168.1.48:8081/survey/${token}/complete`);
       navigate("/thank-you"); // Redirect to a Thank You page or elsewhere after completing the survey
     } catch (err) {
       console.error("Error completing the survey:", err);

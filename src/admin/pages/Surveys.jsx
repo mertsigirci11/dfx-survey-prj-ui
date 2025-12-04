@@ -77,10 +77,14 @@ export default function Surveys() {
         navigate(`/admin/survey/${surveyId}`);
     };
 
+    const onResultClick = (surveyId) => {
+        navigate(`/admin/survey/report/${surveyId}`)
+    }
+
     const actionTemplate = (row) => (
         <div style={{ display: "flex", gap: "6px" }}>
             <Button label="Kopyala" disabled={row.status != "CREATED"} onClick={() => onCopyClick(row.id)} className="p-button-sm p-button-secondary" />
-            <Button label="Sonuçlar" disabled={row.status == "CREATED"} className="p-button-sm p-button-help" />
+            <Button label="Sonuçlar" disabled={row.status == "CREATED"} onClick={() => onResultClick(row.id)} className="p-button-sm p-button-help" />
             <Button label="Gönder" disabled={row.status != "CREATED"} onClick={() => onSendClick(row.id)} className="p-button-sm p-button-success" />
             <Button label="Düzenle" disabled={row.status != "CREATED"} onClick={() => onEditClick(row.id)} className="p-button-sm p-button-warning" />
             <Button label="Sil" onClick={() => onDeleteClick(row.id)} className="p-button-sm p-button-danger" />

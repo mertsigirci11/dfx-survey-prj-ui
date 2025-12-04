@@ -8,6 +8,8 @@ import {
 import AdminLayout from "./admin/layouts/AdminLayout";
 import Surveys from "./admin/pages/Surveys";
 import SurveyDetails from "./admin/pages/SurveyDetails";
+import SurveyRunner from "./survey/pages/SurveyRunner";
+import ThankYouPage from "./survey/pages/ThankYouPage"; 
 
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import "./index.css";
@@ -20,31 +22,44 @@ const router = createBrowserRouter([
     path: "/",
     element: <div>test</div>,
     children: [
-      { index: true, element: <div>PlaceHolder</div>, },
+      { index: true, element: <div>PlaceHolder</div> },
     ]
   },
+
   {
     path: "/admin",
     children: [
-      { path: "logout", element: <Logout />, }
+      { path: "logout", element: <Logout /> }
     ]
   },
+
   {
     path: "/admin/survey",
     element: <AdminLayout />,
     children: [
-      { index: true, element: <Surveys />, },
-      { path: ":id", element: <SurveyDetails />, }
+      { index: true, element: <Surveys /> },
+      { path: ":id", element: <SurveyDetails /> }
     ]
   },
+
+  {
+    path: "/survey/:token",
+    element: <SurveyRunner />
+  },
+
+
   {
     path: "/admin/login",
-    element: <div><Login></Login></div>,
-    /*children: [
-      { index: true, element: <div>PlaceHolder</div>, },
-      { path: "about", element: <div>PlaceHolder</div>, },
-      { path: "*", element: <div>PlaceHolder</div>, }
-    ]*/
+    element: <div><Login /></div>,
+  },
+    {
+    path: "/thank-you",  // This is where the user will be redirected after submission
+    element: <ThankYouPage />,
+  },
+
+  {
+    path: "*",
+    element: <h2 style={{ padding: 20 }}>404 - Sayfa bulunamadı</h2>
   }
 ]);
 

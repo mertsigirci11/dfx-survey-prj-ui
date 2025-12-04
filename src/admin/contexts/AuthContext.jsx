@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
     });
 
     const axiosInstance = axios.create({
-        baseURL: "http://localhost:8081",
+        baseURL: "http://192.168.1.48:8081",
     });
 
     useEffect(() => {

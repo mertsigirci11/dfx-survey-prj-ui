@@ -7,16 +7,27 @@ import {
 
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import "./index.css";
+import Login from "./login/login";
+
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>PlaceHolder</div>,
+    element: <div>test</div>,
     children: [
       { index: true, element: <div>PlaceHolder</div>, },
       { path: "about", element: <div>PlaceHolder</div>, },
       { path: "*", element: <div>PlaceHolder</div>, }
     ]
+  },
+  {
+    path: "/login",
+    element: <div><Login></Login></div>,
+    /*children: [
+      { index: true, element: <div>PlaceHolder</div>, },
+      { path: "about", element: <div>PlaceHolder</div>, },
+      { path: "*", element: <div>PlaceHolder</div>, }
+    ]*/
   }
 ]);
 

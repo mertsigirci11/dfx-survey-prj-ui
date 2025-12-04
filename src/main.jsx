@@ -11,12 +11,14 @@ import SurveyDetails from "./admin/pages/SurveyDetails";
 
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import "./index.css";
+
 import Logout from "./admin/pages/Logout";
+import Login from "./login/login";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>PlaceHolder</div>,
+    element: <div>test</div>,
     children: [
       { index: true, element: <div>PlaceHolder</div>, },
     ]
@@ -24,7 +26,6 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     children: [
-      { path: "login", element: <div>Login</div>, },
       { path: "logout", element: <Logout />, }
     ]
   },
@@ -35,6 +36,15 @@ const router = createBrowserRouter([
       { index: true, element: <Surveys />, },
       { path: ":id", element: <SurveyDetails />, }
     ]
+  },
+  {
+    path: "/admin/login",
+    element: <div><Login></Login></div>,
+    /*children: [
+      { index: true, element: <div>PlaceHolder</div>, },
+      { path: "about", element: <div>PlaceHolder</div>, },
+      { path: "*", element: <div>PlaceHolder</div>, }
+    ]*/
   }
 ]);
 

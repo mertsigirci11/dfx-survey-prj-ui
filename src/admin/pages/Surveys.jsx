@@ -3,10 +3,12 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { axiosInstance } from "../utils/Axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Surveys() {
     const [surveys, setSurveys] = useState([]);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const [first, setFirst] = useState(0);   // PrimeReact için
     const rows = 10;
@@ -68,12 +70,29 @@ export default function Surveys() {
         }
     };
 
+    const onSendClick = async (surveyId) => {
+        try {
+            const res = await axiosInstance.post(`/admin/surveys/${surveyId}/send`);
+
+            if (res?.data?.success) {
+                alert("Anket gönderildi!");
+            }
+
+        } catch (err) {
+            console.error("Survey send error:", err);
+        }
+    };
+
+    const onEditClick = (surveyId) => {
+        navigate(`/admin/survey/${surveyId}`);
+    };
+
     const actionTemplate = (row) => (
         <div style={{ display: "flex", gap: "6px" }}>
             <Button label="Kopyala" onClick={() => onCopyClick(row.id)} className="p-button-sm p-button-secondary" />
             <Button label="Sonuçlar" className="p-button-sm p-button-help" />
-            <Button label="Gönder" className="p-button-sm p-button-success" />
-            <Button label="Düzenle" className="p-button-sm p-button-warning" />
+            <Button label="Gönder" onClick={() => onSendClick(row.id)} className="p-button-sm p-button-success" />
+            <Button label="Düzenle" onClick={() => onEditClick(row.id)} className="p-button-sm p-button-warning" />
         </div>
     );
 
@@ -87,7 +106,7 @@ export default function Surveys() {
             <h2>Anketlerim</h2>
 
             <Button
-                label="+ Yeni"
+                label="Yeni"
                 className="p-button-success"
                 style={{ marginBottom: "15px" }}
             />

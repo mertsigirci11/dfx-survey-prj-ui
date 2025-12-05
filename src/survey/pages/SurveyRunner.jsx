@@ -16,54 +16,40 @@ export default function SurveyRunner() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        // Fetch question summaries by participant token
+        // Survey ve soruları token üzerinden çek
         const resSummary = await axios.get(`http://192.168.1.48:8081/survey/${token}`);
 
-        // If the survey is already completed, handle it
         if (resSummary.data?.code === "400" && resSummary.data?.error === "You already completed this survey") {
           setSurveyCompleted(true);
-          setLoading(false);  // No need to load questions if survey is completed
-          return;  // Stop further processing
-        }
-
-        const questionSummaries = resSummary.data?.data?.questions || [];
-
-        if (questionSummaries.length === 0) {
           setLoading(false);
           return;
         }
 
-        // Fetch full question details
-        const detailedQuestions = await Promise.all(
-          questionSummaries.map(async (q) => {
-            try {
-              const resDetail = await axios.get(`http://192.168.1.48:8081/admin/questions/${q.id}`);
-              return resDetail.data?.data || q; // Fallback to summary if detail fails
-            } catch (err) {
-              return q;
-            }
-          })
-        );
+        const questionList = resSummary.data?.data?.questions || [];
 
-        detailedQuestions.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        // Soruları order alanına göre sırala (opsiyonel)
+        questionList.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-        setQuestions(detailedQuestions);
-        
-        // Set initial answers from backend data
-        const initialAnswers = questionSummaries.reduce((acc, question) => {
-          acc[question.id] = question.answer || null; // Prepopulate answers
+        setQuestions(questionList);
+
+        // Cevapları backend’den gelen answer alanına göre prepopulate et
+        const initialAnswers = questionList.reduce((acc, question) => {
+          acc[question.id] = question.answer ?? null;
           return acc;
         }, {});
         setAnswers(initialAnswers);
-        
+
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching survey questions:", err);
         setLoading(false);
       }
+
     };
 
     fetchQuestions();
   }, [token]);
+
 
   const handleOptionChange = (value) => {
     setAnswers((prev) => ({
@@ -227,9 +213,13 @@ export default function SurveyRunner() {
 
           {currentIndex < total - 1 ? (
             <>
-              <button style={styles.btnSkip} onClick={skip}>
-                Atla
-              </button>
+              {q.required != true &&
+                (
+                  <button style={styles.btnSkip} onClick={skip}>
+                    Atla
+                  </button>
+                )
+              }
               <button style={styles.btnNext} onClick={next}>
                 İleri
               </button>

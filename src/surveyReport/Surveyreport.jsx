@@ -7,7 +7,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 export default function SurveyReport() {
-    const [reportData, setReportData] = useState(null);
+    const [reportData, setReportData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const { id: surveyId } = useParams();
@@ -24,7 +24,6 @@ export default function SurveyReport() {
             return;
         }
 
-        // Sayfanın görüntüsünü canvas olarak alıyoruz
         const canvas = await html2canvas(element, {
             scale: 2,
             useCORS: true
@@ -36,26 +35,17 @@ export default function SurveyReport() {
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
 
-        // Görseli PDF üzerine ölçekleyip yerleştiriyoruz
         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
-        // Dosya indir
         pdf.save("survey-report.pdf");
     };
-
 
     const fetchReport = async () => {
         try {
             const response = await axiosInstance.get(
-                `http://192.168.1.48:8081/admin/surveys/report/${surveyId}`,
-                {
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }
+                `/admin/surveys/report/${surveyId}`
             );
 
-            // backend: response.data.data.questions
             console.log("Report:", response.data);
 
             setReportData(response.data.data.questions);
@@ -69,8 +59,6 @@ export default function SurveyReport() {
     };
 
     if (loading) return <div style={{ padding: 30 }}>Loading...</div>;
-
-    if (!reportData) return <div style={{ padding: 30 }}>Veri bulunamadı.</div>;
 
     return (
         <div className="report-container">
@@ -88,33 +76,56 @@ export default function SurveyReport() {
 
             {/* CONTENT */}
             <div className="report-content" id="report-content">
+
                 {reportData.map((q) => (
                     <div className="question-block" key={q.questionId}>
 
-                        {/* Soru */}
+                        {/* SORU BAŞLIĞI */}
                         <h3 className="question-title">
                             {q.questionText}
                         </h3>
 
-                        {/* Opsiyonlar */}
-                        {q.optionPercentages.map((opt, i) => (
-                            <div className="option-row" key={i}>
-
-                                <div className="option-text">{opt.optionText}</div>
-
-                                <div className="option-bar-wrapper">
-                                    <div
-                                        className="option-bar"
-                                        style={{
-                                            width: opt.percent + "%",
-                                            background: opt.percent > 0 ? "#4caf50" : "#ccc"
-                                        }}
-                                    ></div>
-                                </div>
-
-                                <div className="option-percent">{opt.percent}%</div>
+                        {/* --------------------------------------------- */}
+                        {/* FREETEXT SORULAR */}
+                        {/* --------------------------------------------- */}
+                        {q.type === "FREETEXT" && (
+                            <div className="freetext-list">
+                                {q.answers.length === 0 ? (
+                                    <p style={{ fontStyle: "italic", color: "#666" }}>
+                                        Bu soruya henüz cevap verilmemiş.
+                                    </p>
+                                ) : (
+                                    q.answers.map((ans, i) => (
+                                        <div className="freetext-item" key={i}>
+                                            {ans}
+                                        </div>
+                                    ))
+                                )}
                             </div>
-                        ))}
+                        )}
+
+                        {/* --------------------------------------------- */}
+                        {/* YÜZDELİ SORULAR */}
+                        {/* --------------------------------------------- */}
+                        {q.type !== "FREETEXT" &&
+                            q.optionPercentages.map((opt, i) => (
+                                <div className="option-row" key={i}>
+
+                                    <div className="option-text">{opt.optionText}</div>
+
+                                    <div className="option-bar-wrapper">
+                                        <div
+                                            className="option-bar"
+                                            style={{
+                                                width: opt.percent + "%",
+                                                background: opt.percent > 0 ? "#4caf50" : "#ccc"
+                                            }}
+                                        ></div>
+                                    </div>
+
+                                    <div className="option-percent">{opt.percent}%</div>
+                                </div>
+                            ))}
                     </div>
                 ))}
             </div>
